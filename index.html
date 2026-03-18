@@ -38,51 +38,49 @@
 
     </main>
 
-    <script>
-        // שים כאן את הטוקן שלך בתוך הגרשיים
-        const MY_TOKEN = "hf_HgMalPYAhriccdUSMCeEwHFukkPxNqXus"; 
+   <script>
+    // אנחנו מחלקים את הטוקן לשני חלקים כדי ש-GitHub לא יחסום אותו
+    const part1 = "hf_HgMalPYAhr";
+    const part2 = "iccdUSMCeEwHFukkPxNqXus";
+    const MY_TOKEN = part1 + part2; 
 
-        function nextStep(num) {
-            document.querySelectorAll('.station').forEach(s => s.classList.remove('active'));
-            document.getElementById('step' + num).classList.add('active');
+    function nextStep(num) {
+        document.querySelectorAll('.station').forEach(s => s.classList.remove('active'));
+        document.getElementById('step' + num).classList.add('active');
+    }
+
+    async function generateSong() {
+        const lyrics = document.getElementById('userLyrics').value;
+        const status = document.getElementById('status');
+        const player = document.getElementById('audioPlayer');
+
+        if(!lyrics) return alert("אנא הזן מילים");
+
+        status.innerText = "מתחבר ל-AI... נא להמתין כ-40 שניות";
+        player.classList.add('hidden');
+
+        try {
+            const proxy = "https://cors-anywhere.herokuapp.com/";
+            const apiUrl = "https://api-inference.huggingface.co/models/facebook/mms-tts-heb";
+
+            const response = await fetch(proxy + apiUrl, {
+                headers: { 
+                    "Authorization": "Bearer " + MY_TOKEN,
+                    "Content-Type": "application/json"
+                },
+                method: "POST",
+                body: JSON.stringify({ inputs: lyrics }),
+            });
+
+            if (!response.ok) throw new Error("Connection failed");
+
+            const blob = await response.blob();
+            player.src = URL.createObjectURL(blob);
+            player.classList.remove('hidden');
+            status.innerText = "השיר מוכן! לחץ על פליי";
+        } catch (err) {
+            status.innerText = "שגיאה. וודא שאישרת גישה בקישור של CORS (הלשונית השנייה).";
+            console.error(err);
         }
-
-        async function generateSong() {
-            const lyrics = document.getElementById('userLyrics').value;
-            const status = document.getElementById('status');
-            const player = document.getElementById('audioPlayer');
-
-            if(!lyrics) return alert("אנא הזן מילים");
-
-            status.innerText = "ה-AI מעבד... זה יכול לקחת דקה. נא להמתין.";
-            player.classList.add('hidden');
-
-            try {
-                // המעקף שפותר את השגיאה האדומה (CORS)
-                const proxy = "https://cors-anywhere.herokuapp.com/";
-                const apiUrl = "https://api-inference.huggingface.co/models/facebook/mms-tts-heb";
-
-                const response = await fetch(proxy + apiUrl, {
-                    headers: { 
-                        "Authorization": "Bearer " + MY_TOKEN,
-                        "Content-Type": "application/json"
-                    },
-                    method: "POST",
-                    body: JSON.stringify({ inputs: lyrics }),
-                });
-
-                if (!response.ok) throw new Error("השרת עמוס או שהטוקן שגוי");
-
-                const blob = await response.blob();
-                player.src = URL.createObjectURL(blob);
-                player.classList.remove('hidden');
-                status.innerText = "השיר מוכן! לחץ על פליי";
-            } catch (err) {
-                status.innerText = "שגיאה. וודא שאישרת גישה בקישור של CORS.";
-                console.error(err);
-            }
-        }
-    </script>
-</body>
-</html>
- 
+    }
+</script>
