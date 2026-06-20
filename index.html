@@ -55,7 +55,7 @@
 
         if(!lyrics) return alert("אנא הזן מילים");
 
-        status.innerText = "מתחבר ל-AI... נא להמתין כ-40 שניות";
+        status.innerText = "מתחבר לבינה המלאכותית... נא להמתין כארבעים שניות";
         player.classList.add('hidden');
 
         try {
@@ -78,7 +78,7 @@
             player.classList.remove('hidden');
             status.innerText = "השיר מוכן! לחץ על פליי";
         } catch (err) {
-            status.innerText = "שגיאה. וודא שאישרת גישה בקישור של CORS (הלשונית השנייה).";
+            status.innerText = "שגיאה. וודא שאישרת גישה בקישור של שרת הביניים (הלשונית השנייה).";
             console.error(err);
         }
     }
